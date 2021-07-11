@@ -1,5 +1,6 @@
 var gateway = `ws://${window.location.hostname}/ws`;
 var websocket;
+var testNumber = 0;
 
 window.addEventListener('load', onload);
 
@@ -29,23 +30,25 @@ function onMessage(event) {
     //set all objects on webpage after receiving message from server
     
     var myText = "";
-    var myNumber  = 100;
     var myBool = false; 
     
     myText = jsonReceived["Message"];
-    myNumber = jsonReceived["Number"];
+    testNumber = jsonReceived["Number"];
     myBool = jsonReceived["Bool"]
     
-    console.log(myText + " " + myNumber + " " + myBool);
+    document.getElementById("testValue").innerHTML = testNumber;
+
+    //console.log(myText + " " + testNumber + " " + myBool);
 
     myText = "From Browser";
-    myNumber = 69;
+   // myNumber = 69;
     myBool = true;
 
 
     //set up JSON message before sending mesage to server
+    testNumber++;
     var jsonSend = {"Reply": myText,
-                    "Number": myNumber,
+                    "Number": testNumber,
                     "Bool": myBool};
 
     websocket.send(JSON.stringify(jsonSend));   

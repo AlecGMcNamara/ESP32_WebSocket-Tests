@@ -15,6 +15,8 @@ AsyncWebServer server(80);
 // Create a WebSocket object
 AsyncWebSocket ws("/ws");
 
+int testNumber = 0;
+
 // Initialize SPIFFS
 void initSPIFFS() {
   if (!SPIFFS.begin(true)) {
@@ -44,10 +46,10 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     deserializeJson(jsonReceived,(char*)data);
     
     String myString= jsonReceived["Reply"];
-    int myNumber= jsonReceived["Number"];
+    testNumber= jsonReceived["Number"];
     bool myBool = jsonReceived["Bool"];
 
-    Serial.println(myString + " " + myNumber + " " + myBool);
+    //Serial.println(myString + " " + testNumber + " " + myBool);
   }
 }
 
@@ -76,9 +78,10 @@ void initWebSocket() {
 
 void sendMessage()
 {
+    testNumber++;
     StaticJsonDocument<100> jsonSend;
     jsonSend["Message"] = "From ESP32";
-    jsonSend["Number"] = 59;
+    jsonSend["Number"] = testNumber;
     jsonSend["Bool"] = true; 
     String strMessage = "";
     serializeJson(jsonSend,strMessage);
@@ -107,7 +110,7 @@ static long lastMessage = 0;
   if(lastMessage<millis())
   {
       sendMessage();
-      lastMessage = millis() + 1000;
+      lastMessage = millis() + 50;
   }
   ws.cleanupClients();
 }
