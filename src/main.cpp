@@ -26,8 +26,15 @@ void initSPIFFS() {
 }
 
 // Initialize WiFi
+String hostname = "ESP32Test";
 void initWiFi() {
+
   WiFi.mode(WIFI_STA);
+
+  WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+  WiFi.setHostname(hostname.c_str()); //define hostname
+  //wifi_station_set_hostname( hostname.c_str() );
+
   WiFi.begin(ssid, password);
   Serial.print("Connecting to WiFi ..");
   while (WiFi.status() != WL_CONNECTED) {
@@ -110,7 +117,7 @@ static long lastMessage = 0;
   if(lastMessage<millis())
   {
       sendMessage();
-      lastMessage = millis() + 50;
+      lastMessage = millis() + 500;
   }
   ws.cleanupClients();
 }
