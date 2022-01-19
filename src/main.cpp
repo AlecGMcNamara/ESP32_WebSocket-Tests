@@ -5,19 +5,14 @@
 #include "SPIFFS.h"
 #include <ArduinoJSON.h>
 
-// Replace with your network credentials
 const char* ssid = "SKYPEMHG";
 const char* password = "8NHetSWQAJ75";
 
-// Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
-
-// Create a WebSocket object
 AsyncWebSocket ws("/ws");
 
 int testNumber = 0;
 
-// Initialize SPIFFS
 void initSPIFFS() {
   if (!SPIFFS.begin(true)) {
     Serial.println("An error has occurred while mounting SPIFFS");
@@ -25,16 +20,12 @@ void initSPIFFS() {
   Serial.println("SPIFFS mounted successfully");
 }
 
-// Initialize WiFi
 String hostname = "ESP32Test";
-void initWiFi() {
+void initWiFi() 
+{
 
   WiFi.mode(WIFI_STA);
-
-  WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
   WiFi.setHostname(hostname.c_str()); //define hostname
-  //wifi_station_set_hostname( hostname.c_str() );
-
   WiFi.begin(ssid, password);
   Serial.print("Connecting to WiFi ..");
   while (WiFi.status() != WL_CONNECTED) {
@@ -44,7 +35,8 @@ void initWiFi() {
   Serial.println(WiFi.localIP());
 }
 
-void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
+void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) 
+{
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
     data[len] = 0;
@@ -56,12 +48,13 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     testNumber= jsonReceived["Number"];
     bool myBool = jsonReceived["Bool"];
 
-    //Serial.println(myString + " " + testNumber + " " + myBool);
+    Serial.println(myString + " " + testNumber + " " + myBool);
   }
 }
 
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
-             void *arg, uint8_t *data, size_t len) {
+             void *arg, uint8_t *data, size_t len)
+{
   switch (type) {
     case WS_EVT_CONNECT:
       Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
@@ -78,24 +71,33 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
   }
 }
 
-void initWebSocket() {
+void initWebSocket() 
+{
   ws.onEvent(onEvent);
   server.addHandler(&ws);
+  Serial.println("Initialised the WebSocket");
 }
 
 void sendMessage()
 {
-    testNumber++;
+    if (ws.count() == 0)
+    {
+      testNumber=0;
+    }
+    else{
+      testNumber++;
+    }
     StaticJsonDocument<100> jsonSend;
     jsonSend["Message"] = "From ESP32";
     jsonSend["Number"] = testNumber;
-    jsonSend["Bool"] = true; 
+    jsonSend["Bool"] = false; 
     String strMessage = "";
     serializeJson(jsonSend,strMessage);
     ws.textAll(strMessage);
 }
 
-void setup() {
+void setup() 
+{
   Serial.begin(115200);
   initSPIFFS();
   initWiFi();
@@ -112,12 +114,13 @@ void setup() {
   server.begin();
 }
 
-void loop() {
+void loop() 
+{
 static long lastMessage = 0;
   if(lastMessage<millis())
   {
       sendMessage();
-      lastMessage = millis() + 500;
+      lastMessage = millis() + 1000;
   }
   ws.cleanupClients();
 }

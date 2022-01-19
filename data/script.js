@@ -38,10 +38,9 @@ function onMessage(event) {
     
     document.getElementById("testValue").innerHTML = testNumber;
 
-    //console.log(myText + " " + testNumber + " " + myBool);
+    console.log(myText + " " + testNumber + " " + myBool);
 
     myText = "From Browser";
-   // myNumber = 69;
     myBool = true;
 
 
