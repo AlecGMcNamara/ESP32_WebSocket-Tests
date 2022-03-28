@@ -1,6 +1,5 @@
 var gateway = `ws://${window.location.hostname}/ws`;
 var websocket;
-var testNumber = 0;
 
 window.addEventListener('load', onload);
 
@@ -29,26 +28,29 @@ function onMessage(event) {
   var jsonReceived = JSON.parse(event.data);
     //set all objects on webpage after receiving message from server
     
-    var myText = "";
-    var myBool = false; 
+    setLed(jsonReceived["ip1"], document.getElementById("ledinput1"),"/leds/green.png" ,"/leds/green_off.png" );
+    setLed(jsonReceived["ip2"], document.getElementById("ledinput2"),"/leds/green.png" ,"/leds/green_off.png" );
+    setLed(jsonReceived["ip3"], document.getElementById("ledinput3"),"/leds/green.png" ,"/leds/green_off.png" );
+    setLed(jsonReceived["ip4"], document.getElementById("ledinput4"),"/leds/green.png" ,"/leds/green_off.png" );
+
+    setLed(jsonReceived["op1"], document.getElementById("ledoutput1"),"/leds/red.png" ,"/leds/red_off.png" );
+    setLed(jsonReceived["op2"], document.getElementById("ledoutput2"),"/leds/red.png" ,"/leds/red_off.png" );
+    setLed(jsonReceived["op3"], document.getElementById("ledoutput3"),"/leds/red.png" ,"/leds/red_off.png" );
+    setLed(jsonReceived["op4"], document.getElementById("ledoutput4"),"/leds/red.png" ,"/leds/red_off.png" );
+    console.log("Redeived Message");
     
-    myText = jsonReceived["Message"];
-    testNumber = jsonReceived["Number"];
-    myBool = jsonReceived["Bool"]
-    
-    document.getElementById("testValue").innerHTML = testNumber;
-
-    console.log(myText + " " + testNumber + " " + myBool);
-
-    myText = "From Browser";
-    myBool = true;
-
-
     //set up JSON message before sending mesage to server
-    testNumber++;
-    var jsonSend = {"Reply": myText,
-                    "Number": testNumber,
-                    "Bool": myBool};
+    //var jsonSend = {"Reply": myText,
+    //                "Number": testNumber,
+    //                "Bool": myBool};
 
-    websocket.send(JSON.stringify(jsonSend));   
+    //websocket.send(JSON.stringify(jsonSend));   
+}
+
+function setLed(ledStatus, Led, ledOn, ledOff)
+{
+    if (ledStatus)    {
+      Led.src=ledOn;  }
+    else              {
+      Led.src=ledOff; }
 }
