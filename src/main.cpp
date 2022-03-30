@@ -9,14 +9,14 @@ const char* ssid = "SKYPEMHG";
 const char* password = "8NHetSWQAJ75";
 
 bool output1 = false;
-bool output2 = true;
+bool output2 = false;
 bool output3 = false;
-bool output4 = true;
+bool output4 = false;
 
 bool input1 = false;
-bool input2 = true;
+bool input2 = false;
 bool input3 = false;
-bool input4 = true;
+bool input4 = false;
 
 bool function1clicked = false;
 bool function2clicked = false;
@@ -57,11 +57,12 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
     StaticJsonDocument<100> jsonReceived;
     deserializeJson(jsonReceived,(char*)data);
     
-   // String myString= jsonReceived["Reply"];
-   // testNumber= jsonReceived["Number"];
-   // bool myBool = jsonReceived["Bool"];
+    function1clicked = jsonReceived["fb1"];
+    function2clicked = jsonReceived["fb2"];
+    function3clicked = jsonReceived["fb3"];
+    function4clicked = jsonReceived["fb4"];
 
-    //Serial.println(myString + " " + testNumber + " " + myBool);
+    Serial.print(function1clicked);
   }
 }
 
@@ -94,7 +95,8 @@ void initWebSocket()
 void sendMessage()
 {
     StaticJsonDocument<200> jsonSend;
-    
+    static String LastMessage = "";
+
     jsonSend["ip1"] = input1;
     jsonSend["ip2"] = input2;
     jsonSend["ip3"] = input3;
@@ -105,15 +107,13 @@ void sendMessage()
     jsonSend["op3"] = output3;
     jsonSend["op4"] = output4;
 
-    jsonSend["f1"] = function1clicked;
-    jsonSend["f2"] = function2clicked;
-    jsonSend["f3"] = function3clicked;
-    jsonSend["f4"] = function4clicked;
-
     String strMessage = "";
     serializeJson(jsonSend,strMessage);
-    ws.textAll(strMessage);
-    Serial.println(strMessage);
+    if(strMessage != LastMessage)
+    {
+      ws.textAll(strMessage);
+      LastMessage = strMessage;
+    }
 }
 
 void setup() 
@@ -138,7 +138,19 @@ void pollingLoop()
 {
     //get inputs
     //do logic
-    //set outputs
+    if (function1clicked){
+      output1 = true;
+      output2 = true;
+      output3 = true;
+      output4 = true;
+    }
+    if (function2clicked){
+      output1 = false;
+      output2 = false;
+      output3 = false;
+      output4 = false;
+    //set outputs   
+    }
 }
 
 void loop() 
@@ -146,9 +158,9 @@ void loop()
 static long lastMessage = 0;
   if(lastMessage<millis())
   {
-      pollingLoop();
-      sendMessage();
-      lastMessage = millis() + 1000;
-  }
+    lastMessage = millis() + 100;
+    pollingLoop();
+    sendMessage();
+  }  
   ws.cleanupClients();
 }
