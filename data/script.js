@@ -58,31 +58,28 @@ function sendMessage()
     Function3Pressed = false;
     Function4Pressed = false;
 }
-function fb1Click ()
-{
-  Function1Pressed = true;
-  sendMessage();
-}
 
-function fb2Click ()
+function fbClick (fb)
 {
-  Function2Pressed = true;
+  switch (fb){
+    case 1:
+      Function1Pressed = true;
+      break;
+    case 2:
+      Function2Pressed = true;
+      break;
+    case 3:
+      Function3Pressed = true;
+      break;
+    case 4:
+      Function4Pressed = true;
+      break;
+      }
   sendMessage();
 }
-function fb3Click ()
-{
-  Function3Pressed = true;
-  sendMessage();
-}
-function fb4Click ()
-{
-  Function4Pressed = true;
-  sendMessage();
-}
-
 
 function setLed(ledStatus, Led, ledOn, ledOff)
-{
+{   //change LED image from ON to OFF
     if (ledStatus)    {
       Led.src=ledOn;  }
     else              {

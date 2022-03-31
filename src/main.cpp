@@ -23,6 +23,8 @@ bool function2clicked = false;
 bool function3clicked = false;
 bool function4clicked = false;
 
+String LastMessage = "";
+
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 
@@ -66,12 +68,16 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
   }
 }
 
+void sendMessage();
+
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
              void *arg, uint8_t *data, size_t len)
 {
   switch (type) {
     case WS_EVT_CONNECT:
       Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+      LastMessage="";
+      sendMessage(); //update LEDs
       break;
     case WS_EVT_DISCONNECT:
       Serial.printf("WebSocket client #%u disconnected\n", client->id());
@@ -95,7 +101,6 @@ void initWebSocket()
 void sendMessage()
 {
     StaticJsonDocument<200> jsonSend;
-    static String LastMessage = "";
 
     jsonSend["ip1"] = input1;
     jsonSend["ip2"] = input2;
@@ -119,6 +124,17 @@ void sendMessage()
 void setup() 
 {
   Serial.begin(115200);
+
+  //set up GPIO
+  pinMode(4,INPUT_PULLUP);
+  pinMode(0,INPUT_PULLUP);
+  pinMode(2,INPUT_PULLUP);
+  pinMode(15,INPUT_PULLUP);
+  pinMode(26,OUTPUT);
+  pinMode(27,OUTPUT);
+  pinMode(14,OUTPUT);
+  pinMode(12,OUTPUT);
+
   initSPIFFS();
   initWiFi();
   initWebSocket();
@@ -137,6 +153,10 @@ void setup()
 void pollingLoop()
 {
     //get inputs
+      input1 = digitalRead(4);
+      input2 = digitalRead(0);
+      input3 = digitalRead(2);
+      input4 = digitalRead(15);
     //do logic
     if (function1clicked){
       output1 = true;
@@ -149,8 +169,12 @@ void pollingLoop()
       output2 = false;
       output3 = false;
       output4 = false;
-    //set outputs   
     }
+    //set outputs   
+    digitalWrite(26,output1);
+    digitalWrite(27,output2);
+    digitalWrite(14,output3);
+    digitalWrite(12,output4);
 }
 
 void loop() 
